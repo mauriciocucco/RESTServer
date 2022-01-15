@@ -8,7 +8,7 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: [true, 'The mail is required'],
-        unique: true
+        unique: true //no es una validación de Mongoose, sino de MongoDB
     },
     password: {
         type: String,
@@ -20,7 +20,7 @@ const UserSchema = new Schema({
     role: {
         type: String,
         required: [true, 'The role is required'],
-        enum: ['USER', 'ADMIN']
+        // enum: ['USER', 'ADMIN']
     },
     status: {
         type: Boolean,
@@ -31,5 +31,11 @@ const UserSchema = new Schema({
         default: false
     }
 });
+
+UserSchema.methods.toJSON = function() {
+    const { __v, password, ...user } = this.toObject(); //Saco __v y password del objeto que retorno
+
+    return user;
+};
 
 module.exports = model('User', UserSchema);

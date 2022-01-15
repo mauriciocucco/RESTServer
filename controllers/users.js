@@ -1,44 +1,46 @@
 const { response } = require('express');
-const User = require('../models/User');
+const { getUsers, storeUser, updateUser, getUsersPaginated, deleteUser } = require('../services/users');
 
-const index = (req, res = response) => {
-    const {q , limit = 10, page = 1} = req.query;
+const index = async (req, res = response) => {
+    const users = await getUsers(req);
 
     res.json({
-        message: 'GET API',
-        q,
+        data: users
+    });
+};
+
+const paginated = async (req, res = response) => {
+    const { users, total, limit, from } = await getUsersPaginated(req);
+
+    res.json({
+        data: users,
         limit,
-        page
+        from,
+        total
     });
 };
 
 const store = async (req, res = response) => {
-    const body = req.body;
-    const user = new User( body );
-
-    await user.save();
+    const user = await storeUser(req);
 
     res.status(201).json({
         user
     });
 };
 
-const update = (req, res = response) => {
-
-    const id = req.params.id;
+const update = async (req, res = response) => {
+    const user = await updateUser(req);
 
     res.json({
-        message: 'PUT API',
-        id
+        user
     });
 };
 
-const destroy = (req, res = response) => {
-    const id = req.params.id;
+const destroy = async (req, res = response) => {
+    const user = await deleteUser(req);
 
     res.json({
-        message: 'DELETE API',
-        id
+        user
     });
 };
 
@@ -46,5 +48,6 @@ module.exports = {
     index,
     store,
     update,
-    destroy
+    destroy,
+    paginated
 }
