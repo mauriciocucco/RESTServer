@@ -13,6 +13,4 @@ const validateBody = (req, res, next) => {
 
 };
 
-module.exports = {
-    validateBody
-};
+module.exports = validateBody;

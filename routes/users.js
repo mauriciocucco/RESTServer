@@ -1,16 +1,18 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { index, store, update, destroy, paginated } = require('../controllers/users');
-const { validateBody } = require('../middlewares/validateBody');
+const { validateBody, validateJWT, isAdmin } = require('../middlewares');
 const { roleValidator, emailPostValidator, userValidator } = require('../lib/dbValidators');
 
 const router = Router();
 
-router.get('/', index);
+router.get('/', validateJWT, index);
 
-router.get('/paginated', paginated);
+router.get('/paginated', validateJWT, paginated);
 
 router.post('/', [
+    validateJWT,
+    isAdmin,
     check('name', 'The name is mandatory.').not().isEmpty(),
     check('email', 'The email is not valid.').isEmail(),
     check('email').custom(emailPostValidator),
@@ -23,6 +25,8 @@ router.post('/', [
 ], store);
 
 router.put('/:id', [
+    validateJWT,
+    isAdmin,
     check('id', 'The id is not valid.').isMongoId(),
     check('id').custom(userValidator),
     check('role').custom(role => roleValidator(role, 'put')),
@@ -30,6 +34,8 @@ router.put('/:id', [
 ], update);
 
 router.delete('/:id', [
+    validateJWT,
+    isAdmin,
     check('id', 'The id is not valid.').isMongoId(),
     check('id').custom(userValidator),
     validateBody

@@ -21,6 +21,12 @@ const getUsersPaginated = async (req) => {
     return ({ users, total, limit, from });
 };
 
+const showUser = async (filter) => {
+    const user = await User.findOne(filter);
+
+    return user;
+};
+
 const storeUser = async (req) => {
     const { name, email, password, role } = req.body;
     const user = new User( {
@@ -60,6 +66,7 @@ const deleteUser = async (req) => {
 module.exports = {
     getUsers,
     getUsersPaginated,
+    showUser,
     storeUser,
     updateUser,
     deleteUser

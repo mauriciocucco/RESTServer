@@ -3,10 +3,11 @@ const { loginUser } = require("../services/auth");
 
 const login = async (req, res =  response) => {
     try {
-        await loginUser(req);
+        const { token, user } = await loginUser(req);
         
         res.json({
-            message: "Welcome"
+            user,
+            token
         })
 
     } catch (error) {
