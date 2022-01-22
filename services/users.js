@@ -29,12 +29,12 @@ const showUser = async (filter) => {
 
 const storeUser = async (req) => {
     const { name, email, password, role } = req.body;
-    const user = new User( {
+    const user = new User({
         name,
         email,
         password,
         role
-    } );
+    });
 
     user.password = encryptPassword(password);
 
