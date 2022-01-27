@@ -1,8 +1,8 @@
 const encryptPassword = require('../lib/encryptPassword');
 const User = require('../models/User');
 
-const getUsers = async (req) => {
-    const users = await User.find();
+const getUsers = async () => {
+    const users = await User.find({ status: true });
 
     return users;
 };
@@ -44,21 +44,21 @@ const storeUser = async (req) => {
 };
 
 const updateUser = async (req) => {
-    const id = req.params.id;
+    const { id } = req.params;
     const { _id, password, google, email, ...updateFields } = req.body;
 
     if(password) {
         updateFields.password = encryptPassword(password);
     };
 
-    const user = await User.findByIdAndUpdate(id, updateFields);
+    const user = await User.findByIdAndUpdate(id, updateFields, { new: true }); //el new: true es para que retorne el objeto actualizado
 
     return user;
 };
 
 const deleteUser = async (req) => {
-    const id = req.params.id;
-    const user = await User.findByIdAndUpdate(id, { status: false });
+    const { id } = req.params;
+    const user = await User.findByIdAndUpdate(id, { status: false }, { new: true }); //el new: true es para que retorne el objeto actualizado
 
     return user;
 };

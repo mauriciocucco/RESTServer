@@ -1,35 +1,39 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { validateBody, validateJWT, isAdmin } = require('../middlewares');
-const { roleValidator, userValidator } = require('../lib/dbValidators');
-const { index, show, store, update, destroy } = require('../controllers/categories');
+const { roleValidator } = require('../lib/roleValidators');
+const { categoryExistsById } = require('../lib/categoryValidators');
+const { index, paginated, show, store, update, destroy } = require('../controllers/categories');
 const router = Router();
 
 router.get('/', index);
 
-router.get('/:id', show);
+router.get('/paginated', paginated);
+
+router.get('/:id', [
+    check('id', 'The id is not valid.').isMongoId(),
+    validateBody
+], show);
 
 router.post('/', [
     validateJWT,
+    check('name', 'The name is mandatory.').not().isEmpty(),
     validateBody
 ], store);
 
 router.put('/:id', [
     validateJWT,
+    check('name', 'The name is mandatory.').not().isEmpty(),
     check('id', 'The id is not valid.').isMongoId(),
-    check('id').custom(userValidator),
-    check('role', 'The role is mandatory.').not().isEmpty(),
-    check('role').custom(role => roleValidator(role, 'put')),
+    check('id').custom(categoryExistsById),
     validateBody
 ], update);
 
 router.delete('/:id', [
     validateJWT,
-    check('id', 'The id is not valid.').isMongoId(),
-    check('id').custom(userValidator),
-    check('role', 'The role is mandatory.').not().isEmpty(),
-    check('role').custom(role => roleValidator(role, 'put')),
     isAdmin,
+    check('id', 'The id is not valid.').isMongoId(),
+    check('id').custom(categoryExistsById),
     validateBody
 ], destroy);
 

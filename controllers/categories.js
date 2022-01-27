@@ -1,50 +1,76 @@
 const { response } = require('express');
+const { getCategories, getCategoriesPaginated, getCategory, storeCategory, updateCategory, deleteCategory } = require('../services/categories');
 
 const index = async (req, res = response) => {
-    // const users = await getUsers(req);
+    const categories = await getCategories();
 
     res.json({
-        // data: users
+        data: categories
+    });
+};
+
+const paginated = async (req, res = response) => {
+    const { categories, total, limit, from } = await getCategoriesPaginated(req);
+
+    res.json({
+        data: categories,
+        limit,
+        from,
+        total
     });
 };
 
 const show = async (req, res = response) => {
-    // const { users, total, limit, from } = await getUsersPaginated(req);
+    try {
+        const category = await getCategory(req);
+    
+        res.json({
+            data: category
+        });
 
-    res.json({
-        // data: users,
-        // limit,
-        // from,
-        // total
-    });
+    } catch (error) {
+        console.log('ERROR: ', error);
+        res.status(error.code || 500).json({
+            error: error.error || 'Internal Server Error'
+        });
+    }
 };
 
 const store = async (req, res = response) => {
-    // const user = await storeUser(req);
+    try {
+        const category = await storeCategory(req);
 
-    res.status(201).json({
-        // user
-    });
+        res.status(201).json({
+            category
+        });
+        
+    } catch (error) {
+        console.log('ERROR: ', error);
+        res.status(error.code || 500).json({
+            error: error.error || 'Internal Server Error'
+        });
+    }
 };
 
 const update = async (req, res = response) => {
-    // const user = await updateUser(req);
+    const category = await updateCategory(req);
 
     res.json({
-        // user
+        data: category
     });
 };
 
 const destroy = async (req, res = response) => {
-    // const user = await deleteUser(req);
+    const category = await deleteCategory(req);
 
     res.json({
-        // user
+        data: category
     });
 };
 
 module.exports = {
     index,
+    paginated,
     show,
     store,
     update,

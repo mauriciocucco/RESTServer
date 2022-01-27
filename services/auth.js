@@ -1,4 +1,4 @@
-const { emailAndStatusValidator } = require("../lib/dbValidators");
+const { emailAndStatusValidator } = require("../lib/userValidators");
 const validatePassword = require("../lib/validatePassword");
 const createJWT = require("../lib/createJWT");
 

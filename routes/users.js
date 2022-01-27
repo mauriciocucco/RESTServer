@@ -2,7 +2,8 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const { index, store, update, destroy, paginated } = require('../controllers/users');
 const { validateBody, validateJWT, isAdmin } = require('../middlewares');
-const { roleValidator, emailPostValidator, userValidator } = require('../lib/dbValidators');
+const { emailPostValidator, userExists } = require('../lib/userValidators');
+const { roleExists } = require('../lib/roleValidators');
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.get('/paginated', validateJWT, paginated);
 
 router.post('/', [
     validateJWT,
+    isAdmin,
     check('name', 'The name is mandatory.').not().isEmpty(),
     check('email', 'The email is not valid.').isEmail(),
     check('email').custom(emailPostValidator),
@@ -19,28 +21,24 @@ router.post('/', [
     check('password', 'The password must have a minimum of 6 characters.').isLength({min: 6}),
     check('role', 'The role is mandatory.').not().isEmpty(),
     // check('role', 'The role is not valid.').isIn(['USER', 'ADMIN']),
-    check('role').custom(role => roleValidator(role)),
-    isAdmin,
+    check('role').custom(role => roleExists(role)),
     validateBody
 ], store);
 
 router.put('/:id', [
     validateJWT,
-    check('id', 'The id is not valid.').isMongoId(),
-    check('id').custom(userValidator),
-    check('role', 'The role is mandatory.').not().isEmpty(),
-    check('role').custom(role => roleValidator(role, 'put')),
     isAdmin,
+    check('id', 'The id is not valid.').isMongoId(),
+    check('id').custom(userExists),
+    check('role').custom(role => roleExists(role, 'put')),
     validateBody
 ], update);
 
 router.delete('/:id', [
     validateJWT,
-    check('id', 'The id is not valid.').isMongoId(),
-    check('id').custom(userValidator),
-    check('role', 'The role is mandatory.').not().isEmpty(),
-    check('role').custom(role => roleValidator(role, 'put')),
     isAdmin,
+    check('id', 'The id is not valid.').isMongoId(),
+    check('id').custom(userExists),
     validateBody
 ], destroy);
 

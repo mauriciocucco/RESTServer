@@ -2,7 +2,7 @@ const { response } = require('express');
 const { getUsers, storeUser, updateUser, getUsersPaginated, deleteUser } = require('../services/users');
 
 const index = async (req, res = response) => {
-    const users = await getUsers(req);
+    const users = await getUsers();
 
     res.json({
         data: users
@@ -32,7 +32,7 @@ const update = async (req, res = response) => {
     const user = await updateUser(req);
 
     res.json({
-        user
+        data: user
     });
 };
 
@@ -40,7 +40,7 @@ const destroy = async (req, res = response) => {
     const user = await deleteUser(req);
 
     res.json({
-        user
+        data: user
     });
 };
 
