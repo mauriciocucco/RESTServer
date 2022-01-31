@@ -30,7 +30,7 @@ router.put('/:id', [
     isAdmin,
     check('id', 'The id is not valid.').isMongoId(),
     check('id').custom(userExists),
-    check('role').custom(role => roleExists(role, 'put')),
+    check('role').optional().custom(roleExists),
     validateBody
 ], update);
 

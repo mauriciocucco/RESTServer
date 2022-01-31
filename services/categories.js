@@ -68,7 +68,7 @@ const updateCategory = async (req) => {
     const { id } = req.params;
     const { status, creator, ...data } = req.body;
 
-    data.name = data.name.toUpperCase();
+    if(data.name) data.name = data.name.toUpperCase();
     data.creator = req.authenticatedUser._id;
 
     const category = await Category.findByIdAndUpdate(id, data, { new: true }); //el new: true es para que retorne el objeto actualizado
