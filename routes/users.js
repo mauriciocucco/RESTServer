@@ -2,8 +2,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const { index, store, update, destroy, paginated } = require('../controllers/users');
 const { validateBody, validateJWT, isAdmin } = require('../middlewares');
-const { emailPostValidator, userExists } = require('../lib/userValidators');
-const { roleExists } = require('../lib/roleValidators');
+const { emailPostValidator, userExists, roleExists } = require('../lib');
 
 const router = Router();
 
@@ -27,7 +26,7 @@ router.post('/', [
 
 router.put('/:id', [
     validateJWT,
-    isAdmin,
+    // isAdmin,
     check('id', 'The id is not valid.').isMongoId(),
     check('id').custom(userExists),
     check('role').optional().custom(roleExists),
