@@ -2,7 +2,7 @@ const path = require('path');
 const { response } = require("express");
 const { uploadFile, updateImage, showImage } = require("../services/upload");
 
-const upload = async (req, res = response) => {
+const upload = async (req, res = response, next) => {
     try {
         const file = await uploadFile(req, ['image/png', 'image/jpeg', 'image/gif']);
 
@@ -14,13 +14,11 @@ const upload = async (req, res = response) => {
     } catch (error) {
         console.log('ERROR: ', error);
 
-        res.status(error.code).json({
-            error: error.code === 500 ? "Internal server error" : error.error
-        });
+        next(error);
     }
 };
 
-const update = async (req, res = response) => {
+const update = async (req, res = response, next) => {
     try {
         const model = await updateImage(req);
 
@@ -32,13 +30,11 @@ const update = async (req, res = response) => {
     } catch (error) {
         console.log('ERROR: ', error);
 
-        res.status(error.code).json({
-            error: error.error
-        });
+        next(error);
     }
 };
 
-const show = async (req, res = response) => {
+const show = async (req, res = response, next) => {
     try {
         const image = await showImage(req);
 
@@ -53,13 +49,11 @@ const show = async (req, res = response) => {
     } catch (error) {
         console.log('ERROR: ', error);
 
-        if(error.code === 404) {
+        if(error.status === 404) {
             return res.sendFile(path.join(__dirname, '../public/assets/no-image.jpg'));
         }
 
-        res.status(error.code).json({
-            error: error.error
-        });
+        next(error);
     }
 };
 

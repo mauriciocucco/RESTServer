@@ -3,7 +3,7 @@ const verifyGoogleToken = require("../lib/verifyGoogleToken");
 const { loginUser } = require("../services/auth");
 const verifyGoogleUser = require("../lib/verifyGoogleUser");
 
-const login = async (req, res =  response) => {
+const login = async (req, res =  response, next) => {
     try {
         const { token, user } = await loginUser(req);
         
@@ -13,18 +13,14 @@ const login = async (req, res =  response) => {
         })
 
     } catch (error) {
-        console.log('ERROR', error);
-
-        res.status(error.code).json({
-            error: error.error
-        });
+        next(error)
     }
 };
 
-const googleSignIn = async (req, res = response) => {
-    const { id_token } = req.body;
-
+const googleSignIn = async (req, res = response, next) => {
     try {
+        const { id_token } = req.body;
+
         const googleUser = await verifyGoogleToken(id_token);
 
         const response = await verifyGoogleUser(googleUser);
@@ -34,9 +30,7 @@ const googleSignIn = async (req, res = response) => {
     } catch (error) {
         console.log('ERROR', error);
 
-        res.status(error.code).json({
-            error: error.error
-        });
+        next(error)
     } 
 };
 

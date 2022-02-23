@@ -2,37 +2,37 @@ const { request, response } = require('express');
 const jwt = require('jsonwebtoken');
 const { showUser } = require('../services/users');
 
-const errorMessage = {
-    error: 'Invalid token.'
-};
-
 const validateJWT = async (req = request, res = response, next) => {
-    const token = req.header('Authorization'); //Bearer token
-
-    if(!token) {
-        return res.status(401).json({
-            error: 'Access denied. No token provided.'
-        });
-    };
-
     try {
+        const token = req.header('Authorization'); //Bearer token
+        const error = new Error('Invalid token.');
+
+        if(!token) {
+            error.message = 'Access denied. No token provided.'
+            error.status = 401;
+
+            throw error;
+        };
+
         const { uid } = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
 
         req.authenticatedUser = await showUser({ _id: uid });
 
         if(!req.authenticatedUser) {
-            return res.status(404).json(errorMessage);
+            error.status = 404;
+            throw error;
         };
 
         if (!req.authenticatedUser.status) {
-            return res.status(401).json(errorMessage);
+            error.status = 401;
+            throw error;
         };
 
         next();
 
     } catch (error) {
-        console.log('ERROR', error);
-        res.status(401).json(errorMessage);
+        console.log('ERROR DESDE VALIDATE JWT', error);
+        next(error)
     }
 };
 

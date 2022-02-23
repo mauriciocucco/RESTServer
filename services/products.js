@@ -31,10 +31,11 @@ const getProduct = async (req) => {
                     .populate('category', 'name');
 
     if(!product) {
-        throw ({
-            code: 400,
-            error: 'The product does not exist.'
-        });
+        const error = new Error('The product does not exist.');
+
+        error.status = 400;
+
+        throw error;
     };
 
     return product;
@@ -47,10 +48,11 @@ const storeProduct = async (req) => {
         const productExists = await productExistsByName(name);
 
         if(productExists) {
-            throw {
-                code: 400,
-                error: 'The product already exists.'
-            };
+            const error = new Error('The product already exists.');
+
+            error.status = 400;
+
+            throw error;
         }
 
         const data = {

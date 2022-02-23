@@ -26,7 +26,6 @@ router.post('/', [
 
 router.put('/:id', [
     validateJWT,
-    // isAdmin,
     check('id', 'The id is not valid.').isMongoId(),
     check('id').custom(userExists),
     check('role').optional().custom(roleExists),

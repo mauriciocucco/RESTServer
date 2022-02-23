@@ -11,9 +11,8 @@ const search = async (req, res = response) => {
         
     } catch (error) {
         console.log('ERROR: ', error);
-        res.status(error.code || 500).json({
-            error: error.error || 'Internal server error'
-        })
+        
+        next(error);
     }
 
 };

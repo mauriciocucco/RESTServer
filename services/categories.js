@@ -26,10 +26,11 @@ const getCategory = async (req) => {
     const category = await Category.findById(req.params.id).populate('creator', 'name');
 
     if(!category) {
-        throw ({
-            code: 400,
-            error: 'The category does not exist.'
-        });
+        const error = new Error('The category does not exist.');
+
+        error.status = 400;
+
+        throw error;
     };
 
     return category;
@@ -42,10 +43,11 @@ const storeCategory = async (req) => {
         const categoryExists = await categoryExistsByName(name);
 
         if(categoryExists) {
-            throw {
-                code: 400,
-                error: 'The category already exists.'
-            };
+            const error = new Error('The category already exists.');
+        
+            error.status = 400;
+
+            throw error;
         }
 
         const data = {

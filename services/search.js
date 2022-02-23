@@ -4,10 +4,11 @@ const searchByCollection = async (req) => {
     const { collection, q } = req.params;
 
     if(!allowedCollections.includes(collection)) {
-        throw {
-            code: 400,
-            error: 'The collection is not allowed'
-        }
+        const error = new Error('The collection is not allowed');
+
+        error.status = 400;
+
+        throw error;
     }
 
     switch (collection) {
@@ -18,10 +19,7 @@ const searchByCollection = async (req) => {
         case 'products':
             return await searchInProducts(q);    
         default:
-            throw {
-                code: 500,
-                error: 'Internal server error'
-            }
+            throw new Error('Internal server error.');
     }
 };
 

@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+// const { v4: uuidv4 } = require('uuid');
 const { validateMimetype, verifyModel } = require('../lib');
 const cloudinary = require('cloudinary').v2
 cloudinary.config(process.env.CLOUDINARY_URL);
@@ -12,10 +12,11 @@ const uploadFile = async (req, validMimetypes = ['image/jpeg'], folder = '') => 
         const isValidFile = validateMimetype(validMimetypes, file.mimetype);
 
         if(!isValidFile) {
-            return reject({
-                code: 400,
-                error: 'Invalid file type'
-            })
+            const error = new Error('Invalid file type');
+
+            error.status = 400;
+
+            return reject(error);
         }
 
         //upload to Cloudinary
@@ -85,6 +86,7 @@ const showImage = async (req) => {
     try {
         const { collection, id } = req.params;
         const model = await verifyModel(collection, id);
+        const error = new Error('Image not found');
 
         //from Cloudinary
         if(model.image) {
@@ -98,10 +100,9 @@ const showImage = async (req) => {
         //     return imagePath;
         // }
 
-        throw {
-            code: 404,
-            error: 'Image not found'
-        }
+        error.status = 404;
+
+        throw error;
 
     } catch (error) {
         throw error;

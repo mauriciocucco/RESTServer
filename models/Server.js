@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const { dbConnection } = require('../database/config');
+const { notFound, generalErrors } = require('../middlewares');
 
 class Server {
     constructor() {
@@ -24,6 +25,9 @@ class Server {
 
         //Rutas
         this.routes();
+
+        //Middlewares de errores
+        this.errorsHandlers();
     }
 
     async connectDB() {
@@ -35,7 +39,8 @@ class Server {
         this.app.use(cors());
 
         //Body parser de Express
-        this.app.use(express.json());
+        this.app.use(express.json()); //parsea application/json
+        this.app.use(express.urlencoded({extended: false})); // parsea application/x-www-form-urlencoded
 
         //Directorio público
         this.app.use(express.static('public'));
@@ -55,6 +60,10 @@ class Server {
         this.app.use(this.paths.products, require('../routes/products'));
         this.app.use(this.paths.search, require('../routes/search'));
         this.app.use(this.paths.upload, require('../routes/upload'));
+    }
+
+    errorsHandlers() {
+        this.app.use(notFound, generalErrors)
     }
 
     listen() {
