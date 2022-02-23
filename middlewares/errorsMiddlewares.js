@@ -1,5 +1,5 @@
 
-function notFound(req, res, next) {
+const notFound = (req, res, next) => {
     const error = new Error("Route not found.");
 
     error.status = 404;
@@ -7,7 +7,7 @@ function notFound(req, res, next) {
     next(error);
 }
 
-function generalErrors (err, req, res, next) {
+const generalErrors = (err, req, res, next) => {
 
     if (!err) { //no hay error
         return next();    
