@@ -1,0 +1,10 @@
+#g_id_onload,
+.g_id_signin,
+#google_signout {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+#google_signout {
+  margin-top: 20px;
+}

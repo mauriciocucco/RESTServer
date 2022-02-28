@@ -1,13 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
+const { createServer } = require('http');
 const { dbConnection } = require('../database/config');
 const { notFound, generalErrors } = require('../middlewares');
+const { socketController } = require('../controllers/sockets');
 
 class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT || 5000;
+        this.server = createServer(this.app);
+        this.io = require('socket.io')(this.server);
+
         this.paths = {
             auth: '/api/auth',
             users: '/api/users',
@@ -25,6 +30,9 @@ class Server {
 
         //Rutas
         this.routes();
+
+        //Sockets
+        this.sockets();
 
         //Middlewares de errores
         this.errorsHandlers();
@@ -62,12 +70,17 @@ class Server {
         this.app.use(this.paths.upload, require('../routes/upload'));
     }
 
+    sockets() {
+        this.io.on("connection", ( socket ) => socketController(socket, this.io));
+    }
+
     errorsHandlers() {
         this.app.use(notFound, generalErrors)
     }
 
     listen() {
-        this.app.listen(this.port, () => console.log(`Listening on port ${this.port}`));
+        // this.app.listen(this.port, () => console.log(`Listening on port ${this.port}`)); //no tiene sockets
+        this.server.listen(this.port, () => console.log(`Listening on port ${this.port}`)); //tiene sockets
     }
 }
 

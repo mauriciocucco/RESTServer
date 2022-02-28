@@ -31,7 +31,6 @@ const validateJWT = async (req = request, res = response, next) => {
         next();
 
     } catch (error) {
-        console.log('ERROR DESDE VALIDATE JWT', error);
         next(error)
     }
 };

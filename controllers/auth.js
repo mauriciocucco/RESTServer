@@ -2,8 +2,20 @@ const { response } = require("express");
 const verifyGoogleToken = require("../lib/verifyGoogleToken");
 const { loginUser } = require("../services/auth");
 const verifyGoogleUser = require("../lib/verifyGoogleUser");
+const createJWT = require("../lib/createJWT");
 
-const login = async (req, res =  response, next) => {
+const validateToken = async (req, res = response, next) => {
+    try {
+        const token = await createJWT({ uid: req.authenticatedUser.id });
+    
+        res.json({ user: req.authenticatedUser, refreshToken: token });
+       
+    } catch (error) {
+        next(error);
+    }
+};
+
+const login = async (req, res = response, next) => {
     try {
         const { token, user } = await loginUser(req);
         
@@ -36,5 +48,6 @@ const googleSignIn = async (req, res = response, next) => {
 
 module.exports = {
     login,
-    googleSignIn
+    googleSignIn,
+    validateToken
 };

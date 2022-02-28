@@ -3,9 +3,8 @@ const validatePassword = require("../lib/validatePassword");
 const createJWT = require("../lib/createJWT");
 
 const loginUser = async (req) => {
-    const { email, password } = req.body;
-
     try {
+        const { email, password } = req.body;
         const user = await emailAndStatusValidator(email);
 
         validatePassword(password, user.password);
