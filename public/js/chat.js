@@ -4,7 +4,7 @@ const uidInput = document.getElementById("uidInput");
 const messageInput = document.getElementById("messageInput");
 const usersList = document.getElementById("usersList");
 const messagesList = document.getElementById("messagesList");
-const logoutButton = document.getElementById("logoutButton");
+// const logoutButton = document.getElementById("logoutButton");
 
 const main = async () => {
   await validateToken();
@@ -79,8 +79,8 @@ const socketListeners = () => {
 };
 
 const displayActiveUsers = (activeUsers = []) => {
+  let usersHTML = '';
   usersList.innerHTML = '';
-  usersHTML = '';
 
   activeUsers.forEach(({name, uid}) => {
     usersHTML += `
@@ -119,8 +119,8 @@ const sendMessage = () => {
 };
 
 const displayChatMessages = (messages = []) => {
+  let messagesHTML = '';
   messagesList.innerHTML = '';
-  messagesHTML = '';
 
   messages.forEach(({message, userName}) => {
     messagesHTML += `
