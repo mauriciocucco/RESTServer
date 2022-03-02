@@ -4,7 +4,7 @@ const uidInput = document.getElementById("uidInput");
 const messageInput = document.getElementById("messageInput");
 const usersList = document.getElementById("usersList");
 const messagesList = document.getElementById("messagesList");
-// const logoutButton = document.getElementById("logoutButton");
+const logoutButton = document.getElementById("logoutButton");
 
 const main = async () => {
   await validateToken();
@@ -26,63 +26,59 @@ const validateToken = async () => {
   })
     .then((response) => response.json())
     .then(async ({ error, user: userServer, refreshToken }) => {
-        if(error){
-            window.location = "index.html";
-            throw new Error(error);
-        }
+      if (error) {
+        window.location = "index.html";
+        throw new Error(error);
+      }
 
-        localStorage.setItem("token", refreshToken); //renuevo el token
+      localStorage.setItem("token", refreshToken); //renuevo el token
 
-        user = userServer;
+      user = userServer;
 
-        document.title = `Bienvenido ${user.name}`;
+      document.title = `Bienvenido ${user.name}`;
 
-        await connectSocket();
+      await connectSocket();
     })
     .catch((err) => {
-        console.error("ERROR: ", err);
+      console.error("ERROR: ", err);
     });
 };
 
 const connectSocket = async () => {
-    socket = io({
-        'extraHeaders': {
-            'authorization': localStorage.getItem("token")
-        }
-    });
+  socket = io({
+    extraHeaders: {
+      authorization: localStorage.getItem("token"),
+    },
+  });
 
-    socketListeners();
+  socketListeners();
 };
 
 const socketListeners = () => {
-  socket.on('connect', () => {
-    console.log('ONLINE')
+  socket.on("connect", () => {
+    console.log("ONLINE");
   });
 
-  socket.on('disconnect', () => {
-    console.log('OFFLINE')
+  socket.on("disconnect", () => {
+    console.log("OFFLINE");
   });
 
-  socket.on('public-messages', (messages) => {
+  socket.on("public-messages", (messages) => {
     displayChatMessages(messages);
   });
 
-  socket.on('private-message', (payload) => {
-    console.log('PRIVADO: ', payload);
+  socket.on("private-message", (payload) => {
+    console.log("PRIVADO: ", payload);
   });
 
-  // socket.on('active-users', (activeUsers) => {
-  //   displayActiveUsers(activeUsers);
-  // });
-
-  socket.on('active-users', displayActiveUsers);
+  socket.on("active-users", displayActiveUsers);
 };
 
 const displayActiveUsers = (activeUsers = []) => {
-  let usersHTML = '';
-  usersList.innerHTML = '';
+  let usersHTML = "";
+  usersList.innerHTML = "";
 
-  activeUsers.forEach(({name, uid}) => {
+  activeUsers.forEach(({ name, uid }) => {
     usersHTML += `
       <li>
         <p>
@@ -96,8 +92,8 @@ const displayActiveUsers = (activeUsers = []) => {
   usersList.innerHTML = usersHTML;
 };
 
-messageInput.addEventListener('keyup', ({ keyCode }) => {
-  if(keyCode !== 13) return;
+messageInput.addEventListener("keyup", ({ keyCode }) => {
+  if (keyCode !== 13) return;
 
   sendMessage();
 });
@@ -106,23 +102,23 @@ const sendMessage = () => {
   const message = messageInput.value;
   const uid = uidInput.value.trim();
 
-  if(!message.trim()){
+  if (!message.trim()) {
     return;
   }
 
-  socket.emit('send-message', {
+  socket.emit("send-message", {
     uid,
-    message
+    message,
   });
 
-  messageInput.value = '';
+  messageInput.value = "";
 };
 
 const displayChatMessages = (messages = []) => {
-  let messagesHTML = '';
-  messagesList.innerHTML = '';
+  let messagesHTML = "";
+  messagesList.innerHTML = "";
 
-  messages.forEach(({message, userName}) => {
+  messages.forEach(({ message, userName }) => {
     messagesHTML += `
       <li>
           <span class="text-primary">${userName}: </span>
@@ -132,6 +128,13 @@ const displayChatMessages = (messages = []) => {
   });
 
   messagesList.innerHTML = messagesHTML;
+};
+
+logoutButton.addEventListener("click", signOut);
+
+function signOut() {
+    localStorage.removeItem("token");
+    window.location = "index.html";
 };
 
 main();

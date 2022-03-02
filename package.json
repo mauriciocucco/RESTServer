@@ -1,7 +1,7 @@
 {
   "name": "rest-server",
   "version": "1.0.0",
-  "description": "Cascarón de un servidor con arquitectura REST.",
+  "description": "Servidor básico con arquitectura REST y sockets.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
