@@ -4,9 +4,9 @@
     "description": "Servidor básico con arquitectura REST y sockets.",
     "main": "index.js",
     "scripts": {
-        "start": "npm run build && node dist/index.js",
-        "dev": "nodemon --exec babel-node index.js",
-        "build": "babel src -d dist",
+        "start": "npm run build && node src/api/dist/index.js",
+        "dev": "nodemon --exec babel-node src/api/index.js",
+        "build": "babel src -d src/api/dist",
         "lint": "eslint --fix"
     },
     "author": "Mauricio Cucco",

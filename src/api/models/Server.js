@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit')
 const morgan = require('morgan')
 const fileUpload = require('express-fileupload')
 const { createServer } = require('http')
-const { dbConnection } = require('../database/config')
+const { dbConnection } = require('../../config/database')
 const { notFound, generalErrors } = require('../middlewares')
 const { socketController } = require('../controllers/sockets')
 
