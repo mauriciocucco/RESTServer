@@ -1,63 +1,64 @@
-const form = document.querySelector("form");
-const googleSignoutButton = document.getElementById("google_signout");
+/* eslint-disable no-undef */
+const form = document.querySelector('form')
+const googleSignoutButton = document.getElementById('google_signout')
 
-function handleCredentialResponse(response) {
-  console.log("id_token", response.credential); //ID_TOKEN
+// function handleCredentialResponse(response) {
+//   console.log("idToken", response.credential); // ID_TOKEN
 
-  fetch("http://localhost:8080/api/auth/google", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id_token: response.credential,
-    }),
-  })
-    .then((res) => res.json())
-    .then(({ user, token }) => {
-      localStorage.setItem("email", user.email);
-      localStorage.setItem("token", token);
+//   fetch("http://localhost:8080/api/auth/google", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       id_token: response.credential,
+//     }),
+//   })
+//     .then((res) => res.json())
+//     .then(({ user, token }) => {
+//       localStorage.setItem("email", user.email);
+//       localStorage.setItem("token", token);
 
-      window.location = "chat.html";
+//       window.location = "chat.html";
+//     })
+//     .catch((err) => console.log("ERROR", err));
+// }
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault()
+
+    const formData = {}
+
+    form.elements.forEach((element) => {
+        if (element.name) {
+            formData[element.name] = element.value
+        }
     })
-    .catch((err) => console.log("ERROR", err));
-}
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const formData = {};
-
-  for (const element of form.elements) {
-    console.log(element);
-    if (element.name) {
-      formData[element.name] = element.value;
-    }
-  }
-
-  fetch("http://localhost:8080/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(formData),
-  })
-    .then((res) => res.json())
-    .then(({ token }) => {
-      localStorage.setItem("token", token);
-
-      window.location = "chat.html";
+    fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
     })
-    .catch(console.log);
-});
+        .then((res) => res.json())
+        .then(({ token }) => {
+            localStorage.setItem('token', token)
 
-googleSignoutButton.addEventListener("click", signOut);
+            window.location = 'chat.html'
+        })
+        .catch(console.log)
+})
 
 function signOut() {
-    google.accounts.id.disableAutoSelect();
-  
-    google.accounts.id.revoke(localStorage.getItem("email"), (done) => {
-      localStorage.removeItem("email");
-      location.reload();
-    }); 
-};
+    google.accounts.id.disableAutoSelect()
+
+    google.accounts.id.revoke(localStorage.getItem('email'), () => {
+        localStorage.removeItem('email')
+        // eslint-disable-next-line no-restricted-globals
+        location.reload()
+    })
+}
+
+googleSignoutButton.addEventListener('click', signOut)

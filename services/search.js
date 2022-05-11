@@ -1,28 +1,36 @@
-const { allowedCollections, searchInUsers, searchInCategories, searchInProducts } = require('../lib/searchHelpers');
+const {
+    allowedCollections,
+    searchInUsers,
+    searchInCategories,
+    searchInProducts,
+} = require('../helpers/searchHelpers')
 
-const searchByCollection = async (req) => {
-    const { collection, q } = req.params;
+const searchByCollection = async (reqParams) => {
+    const { collection, q } = reqParams
 
-    if(!allowedCollections.includes(collection)) {
-        const error = new Error('The collection is not allowed');
+    if (!allowedCollections.includes(collection)) {
+        const error = new Error('The collection is not allowed')
 
-        error.status = 400;
+        error.status = 400
 
-        throw error;
+        throw error
     }
 
     switch (collection) {
         case 'users':
-            return await searchInUsers(q);
-        case 'categories': 
-            return await searchInCategories(q);
+            await searchInUsers(q)
+            return
+        case 'categories':
+            await searchInCategories(q)
+            return
         case 'products':
-            return await searchInProducts(q);    
+            await searchInProducts(q)
+            return
         default:
-            throw new Error('Internal server error.');
+            throw new Error('Internal server error.')
     }
-};
+}
 
 module.exports = {
-    searchByCollection
-};
+    searchByCollection,
+}

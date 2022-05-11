@@ -1,53 +1,63 @@
-const { response } = require('express');
-const { getUsers, storeUser, updateUser, getUsersPaginated, deleteUser } = require('../services/users');
+const { response } = require('express')
+const {
+    getUsers,
+    storeUser,
+    updateUser,
+    getUsersPaginated,
+    deleteUser,
+} = require('../services/users')
 
 const index = async (req, res = response) => {
-    const users = await getUsers();
+    const users = await getUsers()
 
     res.json({
-        data: users
-    });
-};
+        data: users,
+    })
+}
 
 const paginated = async (req, res = response) => {
-    const { users, total, limit, from } = await getUsersPaginated(req);
+    const { query } = req
+    const { users, total, limit, from } = await getUsersPaginated(query)
 
     res.json({
         data: users,
         limit,
         from,
-        total
-    });
-};
+        total,
+    })
+}
 
 const store = async (req, res = response) => {
-    const user = await storeUser(req);
+    const { body } = req
+    const user = await storeUser(body)
 
     res.status(201).json({
-        user
-    });
-};
+        user,
+    })
+}
 
 const update = async (req, res = response) => {
-    const user = await updateUser(req);
+    const { params, body } = req
+    const user = await updateUser(params, body)
 
     res.json({
-        data: user
-    });
-};
+        data: user,
+    })
+}
 
 const destroy = async (req, res = response) => {
-    const user = await deleteUser(req);
+    const { params } = req
+    const user = await deleteUser(params)
 
     res.json({
-        data: user
-    });
-};
+        data: user,
+    })
+}
 
 module.exports = {
     index,
     store,
     update,
     destroy,
-    paginated
+    paginated,
 }

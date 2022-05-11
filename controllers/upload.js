@@ -1,64 +1,69 @@
-const path = require('path');
-const { response } = require("express");
-const { uploadFile, updateImage, showImage } = require("../services/upload");
+const path = require('path')
+const { uploadFile, updateImage, showImage } = require('../services/upload')
 
-const upload = async (req, res = response, next) => {
+const upload = async (req, res, next) => {
     try {
-        const file = await uploadFile(req, ['image/png', 'image/jpeg', 'image/gif']);
+        const { files } = req
+        const file = await uploadFile(files, [
+            'image/png',
+            'image/jpeg',
+            'image/gif',
+        ])
 
         res.json({
-            message: "File uploaded",
-            file
+            message: 'File uploaded',
+            file,
         })
-        
     } catch (error) {
-        console.log('ERROR: ', error);
+        console.log('ERROR: ', error)
 
-        next(error);
+        next(error)
     }
-};
+}
 
-const update = async (req, res = response, next) => {
+const update = async (req, res, next) => {
     try {
-        const model = await updateImage(req);
+        const { params, files } = req
+        const model = await updateImage(params, files)
 
         res.json({
-            message: "Image updated",
-            model
+            message: 'Image updated',
+            model,
         })
-        
     } catch (error) {
-        console.log('ERROR: ', error);
+        console.log('ERROR: ', error)
 
-        next(error);
+        next(error)
     }
-};
+}
 
-const show = async (req, res = response, next) => {
+const show = async (req, res, next) => {
     try {
-        const image = await showImage(req);
+        const { params } = req
+        const image = await showImage(params)
 
-        //from Cloudinary
-        res.json({
-            url: image
-        });
+        // from Cloudinary
+        return res.json({
+            url: image,
+        })
 
-        //from local server
+        // from local server
         // res.sendFile(image)
-        
     } catch (error) {
-        console.log('ERROR: ', error);
+        console.log('ERROR: ', error)
 
-        if(error.status === 404) {
-            return res.sendFile(path.join(__dirname, '../public/assets/no-image.jpg'));
+        if (error.status === 404) {
+            return res.sendFile(
+                path.join(__dirname, '../public/assets/no-image.jpg')
+            )
         }
 
-        next(error);
+        return next(error)
     }
-};
+}
 
 module.exports = {
     upload,
     update,
-    show
+    show,
 }

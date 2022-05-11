@@ -1,4 +1,4 @@
-const encryptPassword = require('../lib/encryptPassword')
+const { encryptPassword } = require('../helpers')
 const User = require('../models/User')
 
 const getUsers = async () => {
@@ -7,8 +7,8 @@ const getUsers = async () => {
     return users
 }
 
-const getUsersPaginated = async (req) => {
-    const { limit = 10, from = 0 } = req.query
+const getUsersPaginated = async (queryParams) => {
+    const { limit = 10, from = 0 } = queryParams
     const query = { status: true }
 
     const [total, users] = await Promise.all([
@@ -25,8 +25,8 @@ const showUser = async (filter) => {
     return user
 }
 
-const storeUser = async (req) => {
-    const { name, email, password, role } = req.body
+const storeUser = async (reqBody) => {
+    const { name, email, password, role } = reqBody
     const user = new User({
         name,
         email,
@@ -41,9 +41,9 @@ const storeUser = async (req) => {
     return user
 }
 
-const updateUser = async (req) => {
-    const { id } = req.params
-    const { _id, password, google, email, ...updateFields } = req.body
+const updateUser = async (reqParams, reqBody) => {
+    const { id } = reqParams
+    const { _id, password, google, email, ...updateFields } = reqBody
 
     if (password) {
         updateFields.password = encryptPassword(password)
@@ -54,8 +54,8 @@ const updateUser = async (req) => {
     return user
 }
 
-const deleteUser = async (req) => {
-    const { id } = req.params
+const deleteUser = async (reqParams) => {
+    const { id } = reqParams
     const user = await User.findByIdAndUpdate(
         id,
         { status: false },

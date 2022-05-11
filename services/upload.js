@@ -1,33 +1,41 @@
-const path = require('path');
-const fs = require('fs');
+// const path = require('path');
+// const fs = require('fs');
 // const { v4: uuidv4 } = require('uuid');
-const { validateMimetype, verifyModel } = require('../lib');
 const cloudinary = require('cloudinary').v2
-cloudinary.config(process.env.CLOUDINARY_URL);
+const { validateMimetype, verifyModel } = require('../helpers')
 
-const uploadFile = async (req, validMimetypes = ['image/jpeg'], folder = '') => {
-    return new Promise(async (resolve, reject) => {
-        const { file } = req.files;
+cloudinary.config(process.env.CLOUDINARY_URL)
 
-        const isValidFile = validateMimetype(validMimetypes, file.mimetype);
+const uploadFile = async (
+    files,
+    validMimetypes = ['image/jpeg'] /* , folder = '' */
+) =>
+    // eslint-disable-next-line no-async-promise-executor
+    new Promise(async (resolve, reject) => {
+        const { file } = files
 
-        if(!isValidFile) {
-            const error = new Error('Invalid file type');
+        const isValidFile = validateMimetype(validMimetypes, file.mimetype)
 
-            error.status = 400;
+        if (!isValidFile) {
+            const error = new Error('Invalid file type')
 
-            return reject(error);
+            error.status = 400
+
+            reject(error)
+            return
         }
 
-        //upload to Cloudinary
-        const { tempFilePath } = req.files.file;
-        const { secure_url, public_id } = await cloudinary.uploader.upload(tempFilePath);
+        // upload to Cloudinary
+        const { secureUrl, publicId } = await cloudinary.uploader.upload(
+            file.tempFilePath
+        )
 
         resolve({
-            secure_url, public_id
-        });
+            secureUrl,
+            publicId,
+        })
 
-        //upload to local server
+        // upload to local server
         // const uniqueFileName = uuidv4() + '.' + file.mimetype.split('/')[1];
         // const uploadPath = path.join(__dirname, '../uploads/', folder, uniqueFileName);
 
@@ -39,90 +47,89 @@ const uploadFile = async (req, validMimetypes = ['image/jpeg'], folder = '') => 
         //             error: err
         //         });
         //     }
-        
+
         //         resolve(uniqueFileName);
         //     });
-    });
-};
-
-const updateImage = async (req) => {
-    try {
-        const { collection, id } = req.params;
-        const model = await verifyModel(collection, id);
-
-        //clean previous image
-        deletePreviousImage(collection, model);
-
-        //Cloudinary
-        model.image = await uploadFile(req);
-
-        //local server
-        // model.image = await uploadFile(req, undefined, collection);
-
-        await model.save();
-
-        return model;
-        
-    } catch (error) {
-        throw error;
-    }
-};
+    })
 
 const deletePreviousImage = (collection, model) => {
-    //delete from Cloudinary
-    if(!model.image) return;
-    
-    cloudinary.uploader.destroy(model.image.public_id);
-    
-    //delete from local server
+    // delete from Cloudinary
+    if (!model.image) return
+
+    cloudinary.uploader.destroy(model.image.public_id)
+
+    // delete from local server
     // const imagePath = verifyImage(collection, model);
 
     // if(!imagePath) return;
 
     // fs.unlinkSync(imagePath);
-};
+}
 
-const showImage = async (req) => {
+const updateImage = async (reqParams, files) => {
     try {
-        const { collection, id } = req.params;
-        const model = await verifyModel(collection, id);
-        const error = new Error('Image not found');
+        const { collection, id } = reqParams
+        const model = await verifyModel(collection, id)
 
-        //from Cloudinary
-        if(model.image) {
-            return model.image.secure_url;
+        // clean previous image
+        deletePreviousImage(collection, model)
+
+        // Cloudinary
+        model.image = await uploadFile(files)
+
+        // local server
+        // model.image = await uploadFile(req, undefined, collection);
+
+        await model.save()
+
+        return model
+    } catch (error) {
+        console.log('UPDATE IMAGE ERROR: ', error)
+        throw error
+    }
+}
+
+const showImage = async (reqParams) => {
+    try {
+        const { collection, id } = reqParams
+        const model = await verifyModel(collection, id)
+        const error = new Error('Image not found')
+
+        // from Cloudinary
+        if (model.image) {
+            return model.image.secure_url
         }
 
-        //from local server
+        // from local server
         // const imagePath = verifyImage(collection, model);
 
         // if(imagePath) {
         //     return imagePath;
         // }
 
-        error.status = 404;
+        error.status = 404
 
-        throw error;
-
+        throw error
     } catch (error) {
-        throw error;
+        console.log('SHOW IMAGE ERROR: ', error)
+        throw error
     }
-};
+}
 
-const verifyImage = (collection, model) => {
-    if(!model.image) return false;
+// const verifyImage = (collection, model) => {
+//     if(!model.image) return false;
 
-    const imagePath = path.join(__dirname, '../uploads/', collection, model.image);
+//     const imagePath = path.join(__dirname, '../uploads/', collection, model.image);
 
-    if (fs.existsSync(imagePath)) {
-        return imagePath;
-    } else {
-        return false;
-    }
-};
+//     if (fs.existsSync(imagePath)) {
+//         return imagePath;
+//     } else {
+//         return false;
+//     }
+// };
 
 module.exports = {
     uploadFile,
     updateImage,
-    showImage
-};
+    showImage,
+}

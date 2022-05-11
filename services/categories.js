@@ -1,89 +1,100 @@
-const Category = require("../models/Category");
-const { categoryExistsByName } = require("../lib/categoryValidators");
+/* eslint-disable no-underscore-dangle */
+const Category = require('../models/Category')
+const { categoryExistsByName } = require('../validations/categoryValidators')
 
 const getCategories = async () => {
-    const categories = await Category.find({ status: true}).populate('creator', 'name');
+    const categories = await Category.find({ status: true }).populate(
+        'creator',
+        'name'
+    )
 
-    return categories;
-};
+    return categories
+}
 
-const getCategoriesPaginated = async (req) => {
-    const { limit = 10, from = 0 } = req.query;
-    const query = { status: true };
+const getCategoriesPaginated = async (queryParams) => {
+    const { limit = 10, from = 0 } = queryParams
+    const query = { status: true }
 
-    const [ total, categories ] = await Promise.all([
+    const [total, categories] = await Promise.all([
         Category.countDocuments(query),
         Category.find(query)
-        .populate('creator', 'name')
-        .limit(Number(limit))
-        .skip(Number(from))
-    ]);
+            .populate('creator', 'name')
+            .limit(Number(limit))
+            .skip(Number(from)),
+    ])
 
-    return ({ categories, total, limit, from });
-};
+    return { categories, total, limit, from }
+}
 
-const getCategory = async (req) => {
-    const category = await Category.findById(req.params.id).populate('creator', 'name');
+const getCategory = async (reqParams) => {
+    const category = await Category.findById(reqParams.id).populate(
+        'creator',
+        'name'
+    )
 
-    if(!category) {
-        const error = new Error('The category does not exist.');
+    if (!category) {
+        const error = new Error('The category does not exist.')
 
-        error.status = 400;
+        error.status = 400
 
-        throw error;
-    };
+        throw error
+    }
 
-    return category;
-};
+    return category
+}
 
-const storeCategory = async (req) => {
+const storeCategory = async (reqBody, reqAuthenticatedUser) => {
     try {
-        const name = req.body.name.toUpperCase();
+        const name = reqBody.name.toUpperCase()
 
-        const categoryExists = await categoryExistsByName(name);
+        const categoryExists = await categoryExistsByName(name)
 
-        if(categoryExists) {
-            const error = new Error('The category already exists.');
-        
-            error.status = 400;
+        if (categoryExists) {
+            const error = new Error('The category already exists.')
 
-            throw error;
+            error.status = 400
+
+            throw error
         }
 
         const data = {
             name,
-            creator: req.authenticatedUser._id
-        };
-        
-        const category = new Category(data);
+            creator: reqAuthenticatedUser._id,
+        }
 
-        await category.save();
+        const category = new Category(data)
 
-        return category;
+        await category.save()
 
+        return category
     } catch (error) {
-        throw error;
+        console.log('STORE CATEGORY ERROR: ', error)
+        throw error
     }
-};
+}
 
-const updateCategory = async (req) => {
-    const { id } = req.params;
-    const { status, creator, ...data } = req.body;
+const updateCategory = async (reqBody, reqParams, reqAuthenticatedUser) => {
+    const { status, creator, ...data } = reqBody
+    const { id } = reqParams
 
-    if(data.name) data.name = data.name.toUpperCase();
-    data.creator = req.authenticatedUser._id;
+    if (data.name) data.name = data.name.toUpperCase()
+    data.creator = reqAuthenticatedUser._id
 
-    const category = await Category.findByIdAndUpdate(id, data, { new: true }); //el new: true es para que retorne el objeto actualizado
+    const category = await Category.findByIdAndUpdate(id, data, { new: true }) // el new: true es para que retorne el objeto actualizado
 
-    return category;
-};
+    return category
+}
 
-const deleteCategory = async (req) => {
-    const { id } = req.params;
-    const category = await Category.findByIdAndUpdate(id, { status: false }, { new: true }); //el new: true es para que retorne el objeto actualizado
+const deleteCategory = async (reqParams) => {
+    const { id } = reqParams
+    const category = await Category.findByIdAndUpdate(
+        id,
+        { status: false },
+        { new: true }
+    ) // el new: true es para que retorne el objeto actualizado
 
-    return category;
-};
+    return category
+}
 
 module.exports = {
     getCategories,
@@ -91,5 +102,5 @@ module.exports = {
     getCategory,
     storeCategory,
     updateCategory,
-    deleteCategory
-};
+    deleteCategory,
+}

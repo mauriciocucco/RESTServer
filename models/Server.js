@@ -104,6 +104,7 @@ class Server {
     listen() {
         // this.app.listen(this.port, () => console.log(`Listening on port ${this.port}`)); // no tiene sockets
         this.server.listen(this.port, () =>
+            // eslint-disable-next-line no-console
             console.log(`Listening on port ${this.port}`)
         ) // tiene sockets
     }

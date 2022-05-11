@@ -1,39 +1,60 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
-const { validateBody, validateJWT, isAdmin } = require('../middlewares');
-const { categoryExistsById } = require('../lib/categoryValidators');
-const { index, paginated, show, store, update, destroy } = require('../controllers/categories');
-const router = Router();
+const { Router } = require('express')
+const { check } = require('express-validator')
+const { validateBody, validateJWT, isAdmin } = require('../middlewares')
+const { categoryExistsById } = require('../validations/categoryValidators')
+const {
+    index,
+    paginated,
+    show,
+    store,
+    update,
+    destroy,
+} = require('../controllers/categories')
 
-router.get('/', index);
+const router = Router()
 
-router.get('/paginated', paginated);
+router.get('/', index)
 
-router.get('/:id', [
-    check('id', 'The id is not valid.').isMongoId(),
-    validateBody
-], show);
+router.get('/paginated', paginated)
 
-router.post('/', [
-    validateJWT,
-    check('name', 'The name is mandatory.').not().isEmpty(),
-    validateBody
-], store);
+router.get(
+    '/:id',
+    [check('id', 'The id is not valid.').isMongoId(), validateBody],
+    show
+)
 
-router.put('/:id', [
-    validateJWT,
-    check('name', 'The name is mandatory.').not().isEmpty(),
-    check('id', 'The id is not valid.').isMongoId(),
-    check('id').custom(categoryExistsById),
-    validateBody
-], update);
+router.post(
+    '/',
+    [
+        validateJWT,
+        check('name', 'The name is mandatory.').not().isEmpty(),
+        validateBody,
+    ],
+    store
+)
 
-router.delete('/:id', [
-    validateJWT,
-    isAdmin,
-    check('id', 'The id is not valid.').isMongoId(),
-    check('id').custom(categoryExistsById),
-    validateBody
-], destroy);
+router.put(
+    '/:id',
+    [
+        validateJWT,
+        check('name', 'The name is mandatory.').not().isEmpty(),
+        check('id', 'The id is not valid.').isMongoId(),
+        check('id').custom(categoryExistsById),
+        validateBody,
+    ],
+    update
+)
 
-module.exports = router;
+router.delete(
+    '/:id',
+    [
+        validateJWT,
+        isAdmin,
+        check('id', 'The id is not valid.').isMongoId(),
+        check('id').custom(categoryExistsById),
+        validateBody,
+    ],
+    destroy
+)
+
+module.exports = router

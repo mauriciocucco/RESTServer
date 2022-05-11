@@ -1,23 +1,23 @@
-const { emailAndStatusValidator } = require("../lib/userValidators");
-const validatePassword = require("../lib/validatePassword");
-const createJWT = require("../lib/createJWT");
+const { emailAndStatusValidator } = require('../validations/userValidators')
+const validatePassword = require('../validations/validatePassword')
+const createJWT = require('../helpers/createJWT')
 
-const loginUser = async (req) => {
+const loginUser = async (reqBody) => {
     try {
-        const { email, password } = req.body;
-        const user = await emailAndStatusValidator(email);
+        const { email, password } = reqBody
+        const user = await emailAndStatusValidator(email)
 
-        validatePassword(password, user.password);
+        validatePassword(password, user.password)
 
-        const token = await createJWT({ uid: user.id });
+        const token = await createJWT({ uid: user.id })
 
-        return ({ user, token });
-
+        return { user, token }
     } catch (error) {
-        throw error;
+        console.log('LOGIN USER ERROR: ', error)
+        throw error
     }
-};
+}
 
 module.exports = {
-    loginUser
-};
+    loginUser,
+}
