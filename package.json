@@ -4,7 +4,7 @@
     "description": "Servidor básico con arquitectura REST y sockets.",
     "main": "index.js",
     "scripts": {
-        "start": "npm run build && node src/api/dist/index.js",
+        "start": "npm run build && node src/api/dist/api/index.js",
         "dev": "nodemon --exec babel-node src/api/index.js",
         "build": "babel src -d src/api/dist",
         "lint": "eslint --fix"
