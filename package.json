@@ -1,7 +1,7 @@
 {
     "name": "rest-server",
-    "version": "1.0.0",
-    "description": "Servidor básico con arquitectura REST y sockets.",
+    "version": "2.0.0",
+    "description": "Servidor con arquitectura REST, patrón MVC y sockets.",
     "main": "index.js",
     "scripts": {
         "start": "npm run build && node src/api/dist/api/index.js",
@@ -37,6 +37,7 @@
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-import": "^2.25.4",
+        "eslint-plugin-prettier": "^4.0.0",
         "husky": "^7.0.4",
         "lint-staged": "^12.3.7",
         "prettier": "^2.6.0"
